@@ -2,6 +2,8 @@ const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = {
     name: 'skip',
     description:('Skip the track'),
@@ -17,6 +19,11 @@ module.exports = {
             .setColor('#2f3136')
             .setAuthor({ name: success ? await Translate(`Current music <${queue.currentTrack.title}> skipped <✅>`) : await Translate(`Something went wrong <${inter.member}>... try again ? <❌>`) });
 
+        
+        const id = setTimeout(() => {
+            inter.deleteReply();
+            }, messageDuration);
+    
         return inter.editReply({ embeds: [embed] });
     }
 }

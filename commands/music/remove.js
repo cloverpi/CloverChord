@@ -2,6 +2,8 @@ const { ApplicationCommandOptionType, EmbedBuilder } = require('discord.js');
 const { useMainPlayer, useQueue } = require('discord-player');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = {
     name: 'remove',
     description: "remove a song from the queue",
@@ -50,6 +52,11 @@ module.exports = {
             .setColor('#2f3136')
             .setAuthor({ name: await Translate(`Removed <${trackName}> from the queue <✅>`) });
 
+        
+        const id = setTimeout(() => {
+            inter.deleteReply();
+            }, messageDuration);
+        
         return inter.editReply({ embeds: [embed] });
     }
 }

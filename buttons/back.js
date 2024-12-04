@@ -1,18 +1,11 @@
-const { Translate } = require('../process_tools');
+const playBuilder = require('../events/Player/embedBuilder/playBuilder');
 
 module.exports = async ({ inter, queue }) => {
-  if (!queue?.isPlaying())
-    return inter.editReply({
-      content: await Translate(`No music currently playing... try again ? <❌>`),
-    });
-  if (!queue.history.previousTrack)
-    return inter.editReply({
-      content: await Translate(`There was no music played before <${inter.member}>... try again ? <❌>`),
-    });
-
-  await queue.history.back();
-
-  inter.editReply({
-    content: await Translate(`Playing the <**previous**> track <✅>`),
-  });
+  try {
+    await queue.history.back(true);
+  } catch (e) {
+    console.error(e)
+  }
+  const embed = await playBuilder({queue})
+  return inter.update({ embeds: [embed.content], components: [embed.buttons] })
 };

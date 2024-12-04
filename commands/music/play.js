@@ -2,6 +2,8 @@ const { QueryType, useMainPlayer } = require('discord-player');
 const { ApplicationCommandOptionType, EmbedBuilder } = require('discord.js');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = {
     name: 'play',
     description:("Play a song!"),
@@ -42,8 +44,17 @@ module.exports = {
                     leaveOnEmptyCooldown: client.config.opt.leaveOnEmptyCooldown,
                     leaveOnEnd: client.config.opt.leaveOnEnd,
                     leaveOnEndCooldown: client.config.opt.leaveOnEndCooldown,
-                }
+                },
+                requestedBy: inter.member,
+                startTime: 326,
             });
+
+            // console.log(inter.member)
+            // console.log(track)
+
+            const id = setTimeout(() => {
+                inter.deleteReply();
+              }, messageDuration);
 
             defaultEmbed.setAuthor({ name: await Translate(`Loading <${track.title}> to the queue... <✅>`) });
             await inter.editReply({ embeds: [defaultEmbed] });

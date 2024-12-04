@@ -2,6 +2,8 @@ const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = {
     name: 'back',
     description:("Go back to the last song played"),
@@ -19,6 +21,11 @@ module.exports = {
             .setAuthor({ name: await Translate(`Playing the previous track <✅>`) })
             .setColor('#2f3136');
 
+
+        const id = setTimeout(() => {
+            inter.deleteReply();
+            }, messageDuration);
+        
         inter.editReply({ embeds: [backEmbed] });
     }
 }

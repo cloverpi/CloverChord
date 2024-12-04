@@ -2,6 +2,8 @@ const { ApplicationCommandOptionType, EmbedBuilder } = require('discord.js');
 const { QueryType, useMainPlayer, useQueue } = require('discord-player');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = {
     name: 'playnext',
     description:("Play a song right after this one"),
@@ -37,6 +39,11 @@ module.exports = {
             .setAuthor({ name: await Translate(`Track has been inserted into the queue... it will play next <🎧>`) })
             .setColor('#2f3136');
 
+        
+        const id = setTimeout(() => {
+            inter.deleteReply();
+            }, messageDuration);
+        
         await inter.editReply({ embeds: [playNextEmbed] });
     }
 }

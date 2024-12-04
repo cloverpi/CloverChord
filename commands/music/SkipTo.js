@@ -2,6 +2,8 @@ const { ApplicationCommandOptionType, EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = {
     name: 'skipto',
     description:("Skips to particular track in queue"),
@@ -52,6 +54,10 @@ module.exports = {
             .setAuthor({ name: await Translate(`Skipped to <${trackName}> <✅>`) })
             .setColor('#2f3136')
 
+        const id = setTimeout(() => {
+            inter.deleteReply();
+            }, messageDuration);
+    
         inter.editReply({ embeds: [embed] });
     }
 }

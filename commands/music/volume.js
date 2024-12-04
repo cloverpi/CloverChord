@@ -3,6 +3,8 @@ const { ApplicationCommandOptionType } = require('discord.js');
 const { useQueue } = require('discord-player');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = {
     name: 'volume',
     description:('Adjust the volume'),
@@ -25,8 +27,12 @@ module.exports = {
         const vol = inter.options.getNumber('volume');
         if (queue.node.volume === vol) return inter.editReply({ content: await Translate(`The new volume is already the current one <${inter.member}>... try again ? <❌>`) });
 
-        const success = queue.node.setVolume(vol);
 
+        const id = setTimeout(() => {
+            inter.deleteReply();
+          }, messageDuration);
+
+        const success = queue.node.setVolume(vol);
         return inter.editReply({ content: success ? await Translate(`The volume has been modified to <${vol}/${maxVol}%> <🔊>`) : `Something went wrong ${inter.member}... try again ? ❌` });
     }
 }

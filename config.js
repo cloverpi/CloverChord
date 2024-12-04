@@ -6,18 +6,24 @@ module.exports = {
         guild: process.env.GUILD_ID || 'xxx',
         extraMessages: false,
         loopMessage: false,
+        messageDuration: 3000,
+        embedUpdateDuration: 20000,
         lang: 'en',
-        enableEmojis: false,
+        enableEmojis: true,
     },
 
     emojis:{
         'back': '⏪',
         'skip': '⏩',
         'ResumePause': '⏯️',
+        'play': '▶️',
+        'pause': '⏸️',
+        'stop': '⏹️',
         'savetrack': '💾',
         'volumeUp': '🔊',
         'volumeDown': '🔉',
         'loop': '🔁',
+        'loopSingle': '🔂',
     },
 
     opt: {

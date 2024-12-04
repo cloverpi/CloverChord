@@ -1,6 +1,8 @@
 const { EmbedBuilder } = require('discord.js');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = (queue) => {
 
     (async () => {
@@ -8,6 +10,10 @@ module.exports = (queue) => {
         .setAuthor({ name: await Translate('No more songs in the queue!  <❌>')})
         .setColor('#2f3136');
 
-        queue.metadata.channel.send({ embeds: [embed] });
+        const msg = await queue.metadata.channel.send({ embeds: [embed] });
+
+        const id = setTimeout(() => {
+            msg.delete();
+          }, messageDuration);
     })()
 }

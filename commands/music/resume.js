@@ -2,6 +2,8 @@ const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = {
     name: 'resume',
     description:('Play the track'),
@@ -19,6 +21,11 @@ module.exports = {
             .setAuthor({ name: success ? await Translate(`Current music <${queue.currentTrack.title}> resumed <✅>`) : await Translate(`Something went wrong <${inter.member}>... try again ? <❌>`) })
             .setColor('#2f3136')
 
+        
+        const id = setTimeout(() => {
+            inter.deleteReply();
+            }, messageDuration);
+    
         return inter.editReply({ embeds: [resumeEmbed] });
     }
 }

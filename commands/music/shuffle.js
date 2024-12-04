@@ -2,6 +2,8 @@ const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = {
     name: 'shuffle',
     description:('Shuffle the queue'),
@@ -19,6 +21,12 @@ module.exports = {
             .setColor('#2f3136')
             .setAuthor({ name: await Translate(`Queue shuffled <${queue.tracks.size}> song(s)! <✅>`) });
 
+        
+        
+        const id = setTimeout(() => {
+            inter.deleteReply();
+            }, messageDuration);
+    
         return inter.editReply({ embeds: [embed] });
     }
 }

@@ -3,6 +3,8 @@ const { ApplicationCommandOptionType, EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = {
     name: 'seek',
     description: 'Go back or foward in a song',
@@ -30,6 +32,11 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor('#2f3136')
             .setAuthor({ name: await Translate(`Time set on the current song <**${ms(timeToMS, { long: true })}**> <✅>`) });
+
+
+        const id = setTimeout(() => {
+            inter.deleteReply();
+            }, messageDuration);
 
         inter.editReply({ embeds: [embed] });
     }

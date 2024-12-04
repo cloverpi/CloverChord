@@ -1,6 +1,8 @@
 const { EmbedBuilder } = require('discord.js');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = (queue) => {
     if (queue.metadata.lyricsThread) {
         queue.metadata.lyricsThread.delete();
@@ -14,6 +16,11 @@ module.exports = (queue) => {
         .setAuthor({ name: await Translate(`Disconnected from the voice channel, clearing the queue! <❌>`)})
         .setColor('#2f3136');
 
-        queue.metadata.channel.send({ embeds: [embed] });
+        const msg = await queue.metadata.channel.send({ embeds: [embed] });
+
+        const id = setTimeout(() => {
+            msg.delete();
+          }, messageDuration);
+
     })()
 }

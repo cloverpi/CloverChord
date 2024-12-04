@@ -3,8 +3,11 @@ const { useQueue } = require('discord-player');
 const { Translate } = require('../../process_tools');
 
 module.exports = async (client, inter) => {
-    await inter.deferReply({ ephemeral: true });
+    // console.log("im in here.")
+    
     if (inter.type === InteractionType.ApplicationCommand) {
+        await inter.deferReply();
+        // console.log("application command")
         const DJ = client.config.opt.DJ;
         const command = client.commands.get(inter.commandName);
 
@@ -40,6 +43,7 @@ module.exports = async (client, inter) => {
 
         command.execute({ inter, client });
     } else if (inter.type === InteractionType.MessageComponent) {
+        // console.log("message component")
         const customId = inter.customId;
         if (!customId) return;
 

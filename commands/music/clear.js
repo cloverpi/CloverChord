@@ -2,6 +2,8 @@ const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
 const { Translate } = require('../../process_tools');
 
+const messageDuration = client.config.app.messageDuration;
+
 module.exports = {
     name: 'clear',
     description:('Clear all the music in the queue'),
@@ -19,6 +21,11 @@ module.exports = {
             .setAuthor({ name: await Translate(`The queue has just been cleared <🗑️>`) })
             .setColor('#2f3136');
 
+        
+        const id = setTimeout(() => {
+            inter.deleteReply();
+            }, messageDuration);
+        
         inter.editReply({ embeds: [clearEmbed] });
     }
 }

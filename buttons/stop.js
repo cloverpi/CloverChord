@@ -1,14 +1,7 @@
-const { EmbedBuilder } = require('discord.js');
-const { Translate } = require('../process_tools');
+const playBuilder = require('../events/Player/embedBuilder/playBuilder');
 
 module.exports = async ({ inter, queue }) => {
-    if (!queue?.isPlaying()) return inter.editReply({ content: await Translate(`No music currently playing... try again ? <❌>`) });
-
+    const embed = await playBuilder({queue})
     queue.delete();
-
-    const embed = new EmbedBuilder()
-        .setColor('#2f3136')
-        .setAuthor({ name: await Translate(`Music stopped into this server, see you next time <✅>`) });
-
-    return inter.editReply({ embeds: [embed] });
+    return inter.update({ embeds: [embed.content], components: [embed.buttons] })
 }

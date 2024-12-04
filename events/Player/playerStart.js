@@ -1,58 +1,62 @@
-const { ActionRowBuilder, ButtonBuilder, EmbedBuilder } = require("discord.js");
-const { Translate } = require("../../process_tools");
+const playBuilder = require('./embedBuilder/playBuilder')
 
-module.exports = (queue, track) => {
-  if (!client.config.app.loopMessage && queue.repeatMode !== 0) return;
+const messages = {}
+const timers = {}
+const messagesTimeout = 1800000 //30 mins
+const embedUpdateDuration = client.config.app.embedUpdateDuration;
 
-  let EmojiState = client.config.app.enableEmojis;
-
-  const emojis = client.config.emojis;
-
-  emojis ? EmojiState = EmojiState : EmojiState = false;
-
-
+module.exports = (queue, track, reTrigger) => {
   (async () => {
-    const embed = new EmbedBuilder()
-      .setAuthor({
-        name: await Translate(
-          `Started playing <${track.title}> in <${queue.channel.name}> <🎧>`
-        ),
-        iconURL: track.thumbnail,
-      })
-      .setColor("#2f3136");
+    const { node } = queue;
+    const channel = queue.metadata.channel;
 
-    const back = new ButtonBuilder()
-      .setLabel(EmojiState ? emojis.back : ('Back'))
-      .setCustomId('back')
-      .setStyle('Primary');
+    if ( !node.isPlaying() && !node.isPaused() ) {
+      try {
+        if (timers[channel.id]) { 
+          clearInterval(timers[channel.id])
+          delete timers[channel.id]
+        }
+        if (messages[channel.id]) {
+          const oldmsg = messages[channel.id]
+          delete messages[channel.id]
+          oldmsg.delete()
+        }
+      } catch (error) {
+        console.error(error)
+      }
+      return
+    }
 
-    const skip = new ButtonBuilder()
-      .setLabel(EmojiState ? emojis.skip : ('Skip'))
-      .setCustomId('skip')
-      .setStyle('Primary');
+    const embed = await playBuilder({queue})
 
-    const resumepause = new ButtonBuilder()
-      .setLabel(EmojiState ? emojis.ResumePause : ('Resume & Pause'))
-      .setCustomId('resume&pause')
-      .setStyle('Danger');
-
-    const loop = new ButtonBuilder()
-      .setLabel(EmojiState ? emojis.loop : ('Loop'))
-      .setCustomId('loop')
-      .setStyle('Danger');
-
-    const lyrics = new ButtonBuilder()
-      .setLabel(await Translate("Lyrics"))
-      .setCustomId("lyrics")
-      .setStyle("Secondary");
-
-    const row1 = new ActionRowBuilder().addComponents(
-      back,
-      loop,
-      resumepause,
-      skip,
-      lyrics
-    );
-    queue.metadata.channel.send({ embeds: [embed], components: [row1] });
+    try {
+      if( messages[channel.id] == null ) {
+        const msg = await channel.send({ embeds: [embed.content], components: [embed.buttons] });
+        messages[msg.channelId] = msg
+        if (!timers[msg.channelId]) {
+          timers[msg.channelId] = setInterval(() => {
+                                    queue.player.events.emit("playerStart", queue, queue.currentTrack)
+                                  }, embedUpdateDuration);
+        }
+      } else {
+        const oldmsg = messages[channel.id]
+        const curTime = Date.now()
+        if ( (curTime - oldmsg.createdTimestamp) >= messagesTimeout) {
+          oldmsg.delete()
+          const msg = await channel.send({ embeds: [embed.content], components: [embed.buttons] });
+          messages[msg.channelId] = msg
+        } else {
+          const msg = await oldmsg.edit({ embeds: [embed.content], components: [embed.buttons] })
+          messages[channel.id] = msg
+        }
+      }
+    } catch (e) {
+      delete messages[channel.id]
+      console.error(e)
+      if (!reTrigger) { 
+        console.log('Attempting to retrigger event\nLikely due to missing message or permissions\n  This will not be repeated.')
+        queue.player.events.emit("playerStart", queue, track, true) 
+      }
+    }
   })();
 };
